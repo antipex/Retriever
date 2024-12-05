@@ -6,11 +6,39 @@
 //
 
 import Testing
+@testable import Retriever
 
-struct RetrieverTests {
+struct RecipeListTests {
+    @Test func testNormalRecipes() async throws {
+        let recipeListViewModel = RecipeListViewModel(
+            recipeRepository: MockRecipeRepository(kind: .normal)
+        )
 
-    @Test func example() async throws {
-        // Write your test here and use APIs like `#expect(...)` to check expected conditions.
+        await recipeListViewModel.reload()
+
+        #expect(recipeListViewModel.recipes.count == 63)
+        #expect(recipeListViewModel.state == .loaded)
     }
 
+    @Test func testMalformedRecipes() async throws {
+        let recipeListViewModel = RecipeListViewModel(
+            recipeRepository: MockRecipeRepository(kind: .malformed)
+        )
+
+        await recipeListViewModel.reload()
+
+        #expect(recipeListViewModel.recipes.isEmpty)
+        #expect(recipeListViewModel.state == .error)
+    }
+
+    @Test func testEmptyRecipes() async throws {
+        let recipeListViewModel = RecipeListViewModel(
+            recipeRepository: MockRecipeRepository(kind: .empty)
+        )
+
+        await recipeListViewModel.reload()
+
+        #expect(recipeListViewModel.recipes.isEmpty)
+        #expect(recipeListViewModel.state == .loaded)
+    }
 }
